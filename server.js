@@ -10,6 +10,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
+// for register
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 
 /* MySQL Connection */
 
@@ -32,6 +35,8 @@ console.log("MySQL Connected");
 }
 
 });
+
+
 
 
 /* Register Donor */
@@ -62,7 +67,7 @@ res.send("Donor Registered Successfully");
 app.get("/search/:blood",(req,res)=>{
 
 const blood=req.params.blood;
-
+const city=req.params.city;
 const sql="SELECT * FROM donors WHERE blood_group=?";
 
 db.query(sql,[blood],(err,result)=>{
@@ -129,3 +134,59 @@ console.log("Server running on http://localhost:3000");
 });
 
 
+// // route connect
+// const authRoutes = require("./routes/authRoutes");
+
+// app.use("/auth", authRoutes);
+
+// connect register
+/* Register API */
+
+app.post("/register",(req,res)=>{
+// console.log("Inserted ID:",result.insertId);
+// console.log("Rows affected:",result.affectedRows);
+console.log("Incoming Data:",req.body); 
+
+const {name,email,password}=req.body;
+
+const sql="INSERT INTO users(name,email,password) VALUES(?,?,?)";
+
+db.query(sql,[name,email,password],(err,result)=>{
+
+if(err){
+console.log("DB Error",err);    
+res.send("Registration Failed");
+}else{
+console.log("Inserted ID:",result.insertID);  
+console.log("Rows affected:",result.affectedRows);  
+res.send("Registration Successful");
+}
+
+});
+
+});
+
+
+/* Login API */
+
+app.post("/login",(req,res)=>{
+
+const {email,password}=req.body;
+
+const sql="SELECT * FROM users WHERE email=? AND password=?";
+
+db.query(sql,[email,password],(err,result)=>{
+
+if(result.length>0){
+
+res.json({success:true});
+
+}else{
+
+res.json({success:false});
+
+}
+
+});
+
+});

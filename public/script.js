@@ -77,9 +77,11 @@ fetch(`http://localhost:3000/search/${blood}`)
 .then(res=>res.json())
 
 .then(data=>{
-
+   
 let output="";
-
+if(data.length===0){
+output="<tr><td colspan='4'>No donors found</td></tr>";
+}
 data.forEach(donor=>{
 
 output+=`
